@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Passeio Literário - Rio Claro 🎲</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+      color: #fff;
+      text-align: center;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .container {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 25px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    h1 {
+      font-size: 2.8rem;
+      margin-bottom: 10px;
+      color: #fff;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .subtitle {
+      font-size: 1.2rem;
+      color: #f8f8f8;
+      margin-bottom: 15px;
+    }
+    
+    .authors {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .author-tag {
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+      color: white;
+      padding: 6px 15px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* SETUP */
+    #setup {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 15px;
+      padding: 25px;
+      margin: 0 auto 25px;
+      max-width: 600px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    #setup h2 {
+      margin-bottom: 20px;
+      color: #fff;
+    }
+    
+    .input-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+    
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #fff;
+    }
+    
+    #setup input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    
+    #setup input::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    #setup input:focus {
+      border-color: #2575fc;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(37, 117, 252, 0.3);
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* BOTÕES */
+    .btn {
+      margin: 10px 5px;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 50px;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+    }
+    
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+    }
+    
+    .btn:active {
+      transform: translateY(1px);
+    }
+    
+    .btn:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+    }
+    
+    .btn-start { 
+      background: linear-gradient(to right, #4CAF50, #2E7D32);
+      width: 100%;
+      padding: 15px;
+      font-size: 1.2rem;
+      margin-top: 15px;
+    }
+    
+    .btn-roll  { 
+      background: linear-gradient(to right, #2196F3, #0D47A1);
+      width: 100%;
+      padding: 15px;
+      font-size: 1.2rem;
+      margin-top: 15px;
+    }
+    
+    .btn-reset { 
+      background: linear-gradient(to right, #f44336, #b71c1c);
+      margin-top: 20px;
+    }
+    
+    .btn-answer {
+      background: linear-gradient(to right, #FF9800, #F57C00);
+      margin: 8px 0;
+      width: 100%;
+    }
+    
+    /* JOGO */
+    .game-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 25px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    
+    #board-container {
+      flex: 1;
+      min-width: 300px;
+      max-width: 650px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 15px;
+      padding: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    #board {
+      position: relative;
+      width: 100%;
+      height: 0;
+      padding-bottom: 95%; /* Espaço para o novo layout */
+      background: linear-gradient(135deg, #8e9eab, #eef2f3);
+      border-radius: 10px;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+    
+    .square {
+      position: absolute;
+      width: 8.5%;
+      height: 8.5%;
+      border: 1px solid #666;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      font-size: min(2.5vw, 12px);
+      border-radius: 8px;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.9);
+    }
+    
+    .square:hover {
+      transform: scale(1.05);
+      z-index: 10;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .square.start {
+      background: linear-gradient(135deg, #4CAF50, #81C784);
+      color: white;
+      font-weight: bold;
+      font-size: min(2vw, 12px);
+    }
+    
+    .square.finish {
+      background: linear-gradient(135deg, #F44336, #E57373);
+      color: white;
+      font-weight: bold;
+      font-size: min(2vw, 12px);
+    }
+    
+    /* Novos estilos para casas especiais */
+    .square.atalho {
+      background: linear-gradient(135deg, #6A11CB, #2575FC) !important;
+      color: white !important;
+    }
+    
+    .square.labirinto {
+      background: linear-gradient(135deg, #FF416C, #FF4B2B) !important;
+      color: white !important;
+    }
+    
+    .square.desafio {
+      background: linear-gradient(135deg, #FFD700, #FFA500) !important;
+      color: #333 !important;
+      font-weight: bold;
+    }
+    
+    .piece {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      position: absolute;
+      transition: all 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+      border: 2px solid white;
+      z-index: 5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      font-size: 12px;
+      color: white;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+    }
+    
+    .red    { background: linear-gradient(135deg, #F44336, #B71C1C); }
+    .blue   { background: linear-gradient(135deg, #2196F3, #0D47A1); }
+    .green  { background: linear-gradient(135deg, #4CAF50, #1B5E20); }
+    .yellow { background: linear-gradient(135deg, #FFEB3B, #F57F17); }
+    
+    #sidebar {
+      flex: 0 0 320px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 15px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      text-align: left;
+    }
+    
+    #sidebar h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #fff;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+      padding-bottom: 10px;
+    }
+    
+    .player-info {
+      margin: 12px 0;
+      padding: 10px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #fff;
+    }
+    
+    .player-name {
+      font-weight: bold;
+    }
+    
+    .player-points {
+      background: #2575fc;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: bold;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    }
+    
+    #question-container {
+      margin-top: 25px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+    
+    #question-container h3 {
+      margin-bottom: 15px;
+      color: #fff;
+      text-align: center;
+    }
+    
+    #question {
+      font-size: 1.1rem;
+      margin-bottom: 15px;
+      line-height: 1.5;
+      font-weight: 500;
+      color: #fff;
+    }
+    
+    #message {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: white;
+    }
+    
+    .success {
+      background: rgba(76, 175, 80, 0.3);
+      border: 2px solid #4CAF50;
+    }
+    
+    .error {
+      background: rgba(244, 67, 54, 0.3);
+      border: 2px solid #F44336;
+    }
+    
+    .info {
+      background: rgba(33, 150, 243, 0.3);
+      border: 2px solid #2196F3;
+    }
+    
+    #dice-result {
+      text-align: center;
+      margin: 15px 0;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #fff;
+    }
+    
+    #dice {
+      font-size: 4rem;
+      display: block;
+      margin: 10px auto;
+      transition: transform 0.5s;
+      filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.7));
+    }
+    
+    .rolling {
+      animation: roll 0.8s ease-out;
+    }
+    
+    @keyframes roll {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.3); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+    
+    #final-message {
+      display: none;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 15px;
+      padding: 30px;
+      margin: 30px auto;
+      max-width: 800px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      text-align: center;
+      color: white;
+    }
+    
+    #final-message h2 {
+      font-size: 2.2rem;
+      color: #fff;
+      margin-bottom: 25px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .winner {
+      font-size: 1.8rem;
+      color: #FFEB3B;
+      margin: 20px 0;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+    
+    .ranking {
+      list-style: none;
+      margin: 25px 0;
+      text-align: left;
+      padding: 0 20px;
+    }
+    
+    .ranking li {
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      font-size: 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      color: white;
+    }
+    
+    .ranking .rank {
+      background: #2575fc;
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 15px;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    }
+    
+    @media (max-width: 900px) {
+      .game-container {
+        flex-direction: column;
+      }
+      
+      #sidebar {
+        width: 100%;
+        max-width: 650px;
+        margin: 0 auto;
+      }
+      
+      .square {
+        font-size: min(3vw, 12px);
+      }
+      
+      h1 {
+        font-size: 2.2rem;
+      }
+    }
+    
+    .instructions {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 20px;
+      text-align: left;
+      color: #fff;
+    }
+    
+    .instructions h3 {
+      margin-bottom: 10px;
+      color: #FFEB3B;
+    }
+    
+    .instructions ul {
+      padding-left: 20px;
+    }
+    
+    .instructions li {
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    
+    .path-indicator {
+      position: absolute;
+      height: 3px;
+      background: #333;
+      z-index: 1;
+      transform-origin: left center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Passeio Literário - Rio Claro 🎲</h1>
+      <p class="subtitle">Um jogo de tabuleiro sobre grandes autores da literatura brasileira</p>
+      <div class="authors">
+        <span class="author-tag">Fagundes Varela</span>
+        <span class="author-tag">Vinicius de Moraes</span>
+        <span class="author-tag">Carolina Maria de Jesus</span>
+      </div>
+    </header>
+
+    <div id="setup">
+      <h2>Configuração do Jogo</h2>
+      <div class="input-group">
+        <label for="player1">Jogador 1 (Vermelho)</label>
+        <input type="text" id="player1" placeholder="Nome do Jogador 1" value="Torrão">
+      </div>
+      <div class="input-group">
+        <label for="player2">Jogador 2 (Azul)</label>
+        <input type="text" id="player2" placeholder="Nome do Jogador 2" value="Cap">
+      </div>
+      <div class="input-group">
+        <label for="player3">Jogador 3 (Verde)</label>
+        <input type="text" id="player3" placeholder="Nome do Jogador 3" value="Luzia">
+      </div>
+      <div class="input-group">
+        <label for="player4">Jogador 4 (Amarelo)</label>
+        <input type="text" id="player4" placeholder="Nome do Jogador 4" value="Thiago">
+      </div>
+      <button class="btn btn-start" onclick="startGame()">🎮 Iniciar Jogo</button>
+    </div>
+
+    <div id="game" style="display: none;">
+      <div class="game-container">
+        <div id="board-container">
+          <div id="board"></div>
+        </div>
+        
+        <div id="sidebar">
+          <h2>Placar e Controles</h2>
+          <div id="scoreboard"></div>
+          
+          <div id="dice-result">
+            <div id="dice">🎲</div>
+            <div id="dice-text">Clique em "Jogar Dado" para começar</div>
+          </div>
+          
+          <button id="roll-btn" class="btn btn-roll" onclick="rollDice()">
+            Jogar Dado
+          </button>
+          
+          <div id="question-container">
+            <h3>Pergunta da Casa</h3>
+            <div id="question"></div>
+            <div id="answers"></div>
+          </div>
+          
+          <div id="message" class="info">
+            Aguardando início do jogo...
+          </div>
+          
+          <div class="instructions">
+            <h3>Como Jogar:</h3>
+            <ul>
+              <li>Jogue o dado para mover sua peça</li>
+              <li>Ao parar em uma casa, responda a pergunta</li>
+              <li>Acertando: ganhe 10 pontos</li>
+              <li>Errando: permaneça na mesma casa</li>
+              <li>Primeiro a chegar no final ganha bônus!</li>
+              <li>Casas especiais: Atalho (+3), Labirinto (-2), Desafio (20 pontos)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="final-message"></div>
+  </div>
+
+  <script>
+    // Configurações do jogo
+    const maxPosition     = 36; // Aumentado para 36 casas
+    const squaresPerRow   = 8;  // Alterado para 8 casas por linha
+    const squarePositions = {};
+    const boardEl         = document.getElementById("board");
+    const setupDiv        = document.getElementById("setup");
+    const gameDiv         = document.getElementById("game");
+    const questionDiv     = document.getElementById("question");
+    const answersDiv      = document.getElementById("answers");
+    const messageDiv      = document.getElementById("message");
+    const scoreboardDiv   = document.getElementById("scoreboard");
+    const finalDiv        = document.getElementById("final-message");
+    const rollBtn         = document.getElementById("roll-btn");
+    const diceEl          = document.getElementById("dice");
+    const diceText        = document.getElementById("dice-text");
+
+    let players = [];
+    let currentPlayerIndex = 0;
+    let finishOrder = 1;
+    let diceRoll = 0;
+
+    // Autores
+    const authors = [
+      { name: "Fagundes Varela", color: "#4CAF50" },
+      { name: "Vinicius de Moraes", color: "#2196F3" },
+      { name: "Carolina Maria de Jesus", color: "#9C27B0" }
+    ];
+
+    // Definição das casas especiais
+    const specialSquares = {
+      5:  { type: 'atalho', text: 'Atalho' },
+      12: { type: 'labirinto', text: 'Labirinto' },
+      19: { type: 'desafio', text: 'Desafio' },
+      26: { type: 'atalho', text: 'Atalho' },
+      33: { type: 'labirinto', text: 'Labirinto' },
+      35: { type: 'desafio', text: 'Desafio' }
+    };
+
+    // Todas as perguntas
+    const questions = [
+      // Fagundes Varela
+      { author: 0, q: "Em que movimento literário Fagundes Varela se destacou?", a: ["Romantismo", "Realismo", "Modernismo"], c: 0 },
+      { author: 0, q: "Qual o tema principal de 'Cântico do Calvário'?", a: ["Amor", "Natureza", "Espiritualidade"], c: 2 },
+      { author: 0, q: "No poema 'Saudade', Varela expressa:", a: ["Felicidade", "Dor e melancolia", "Esperança"], c: 1 },
+      { author: 0, q: "'O Salmo do Cinzel' aborda sobretudo:", a: ["Guerra", "Arte e criação", "Política"], c: 1 },
+      { author: 0, q: "Varela era conhecido como o poeta da:", a: ["Saudade", "Natureza", "Liberdade"], c: 0 },
+      { author: 0, q: "Qual destes é um poema de Varela?", a: ["Cântico do Calvário", "No Meio do Caminho", "Pau-Brasil"], c: 0 },
+      { author: 0, q: "A obra 'Hinos' destaca:", a: ["Nacionalismo", "Religiosidade", "Erotismo"], c: 1 },
+      { author: 0, q: "Varela foi contemporâneo de qual poeta?", a: ["Castro Alves", "Carlos Drummond", "Manuel Bandeira"], c: 0 },
+      { author: 0, q: "Em que ano Varela publicou sua primeira obra?", a: ["1857", "1861", "1865"], c: 1 },
+      
+      // Vinicius de Moraes
+      { author: 1, q: "Qual era o apelido literário de Vinicius de Moraes?", a: ["Poetinha", "Poetão", "Bebeto"], c: 0 },
+      { author: 1, q: "'Orfeu da Conceição' inspira-se na mitologia de:", a: ["Orfeu", "Édipo", "Prometeu"], c: 0 },
+      { author: 1, q: "'Garota de Ipanema' teve música de:", a: ["Tom Jobim", "Chico Buarque", "João Gilberto"], c: 0 },
+      { author: 1, q: "'Soneto de Fidelidade' celebra:", a: ["Amor eterno", "Amizade", "Natureza"], c: 0 },
+      { author: 1, q: "Pertence à Geração de:", a: ["22", "45", "Modernista"], c: 0 },
+      { author: 1, q: "Parceiro musical de Vinicius:", a: ["João Gilberto", "Gilberto Gil", "Roberto Carlos"], c: 0 },
+      { author: 1, q: "'A Rosa de Hiroxima' aborda:", a: ["Guerra nuclear", "Amor proibido", "Ditadura"], c: 0 },
+      { author: 1, q: "Compositor de 'Chega de Saudade':", a: ["Tom Jobim", "Baden Powell", "Pixinguinha"], c: 0 },
+      { author: 1, q: "Em que ano faleceu Vinicius de Moraes?", a: ["1971", "1980", "1965"], c: 0 },
+      { author: 1, q: "Qual destes não é um livro de Vinicius?", a: ["O Caminho para a Distância", "Novos Poemas", "Claro Enigma"], c: 2 },
+      
+      // Carolina Maria de Jesus
+      { author: 2, q: "Carolina Maria de Jesus é autora de:", a: ["Quarto de Despejo", "Casa de Alvenaria", "Diário de um Favelado"], c: 0 },
+      { author: 2, q: "Onde ela encontrava papel para o diário?", a: ["Feira livre", "Lixo da favela", "Bibliotecas"], c: 1 },
+      { author: 2, q: "Em que ano 'Quarto de Despejo' foi publicado?", a: ["1960", "1962", "1965"], c: 1 },
+      { author: 2, q: "O nome da favela onde viveu Carolina era:", a: ["Paraisópolis", "Canindé", "Favela do Canindé"], c: 2 },
+      { author: 2, q: "Além de escritora, ela também era:", a: ["Catadora de papel", "Professora", "Costureira"], c: 0 },
+      { author: 2, q: "'Quarto de Despejo' foi traduzido para mais de ___ idiomas.", a: ["12", "5", "20"], c: 0 },
+      { author: 2, q: "Ganhou reconhecimento por expor:", a: ["Pobreza urbana", "Censura", "Cultura erudita"], c: 0 },
+      { author: 2, q: "Quem escreveu o prefácio de 'Quarto de Despejo'?", a: ["Jorge Amado", "Vinicius de Moraes", "Graciliano Ramos"], c: 0 },
+      { author: 2, q: "Carolina Maria de Jesus nasceu em:", a: ["Minas Gerais", "Rio de Janeiro", "São Paulo"], c: 0 },
+      { author: 2, q: "Quantos diários Carolina escreveu?", a: ["20", "35", "50"], c: 1 }
+    ];
+
+    // Embaralha as perguntas
+    function shuffleQuestions() {
+      for (let i = questions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [questions[i], questions[j]] = [questions[j], questions[i]];
+      }
+    }
+
+    // Novo layout do tabuleiro com 8 casas por linha e curvas de 3 casas
+    function createBoard() {
+      const colStep = 11.5; // Espaçamento horizontal
+      const rowStep = 15;   // Espaçamento vertical (equivalente a 3 casas)
+      let x = 1, y = 1;
+      let leftToRight = true;
+
+      for (let i = 1; i <= maxPosition; i++) {
+        const cell = document.createElement("div");
+        cell.className = "square";
+        if (i === 1) cell.classList.add("start");
+        if (i === maxPosition) cell.classList.add("finish");
+        
+        // Casas especiais
+        if (specialSquares[i]) {
+          cell.classList.add(specialSquares[i].type);
+          cell.textContent = specialSquares[i].text;
+        } else {
+          cell.textContent = i === 1 ? "Início" : i === maxPosition ? "Chegada" : i;
+        }
+        
+        cell.title = `Casa ${i}`;
+        cell.style.left = `${x}%`;
+        cell.style.top = `${y}%`;
+        
+        boardEl.appendChild(cell);
+        squarePositions[i] = { x: x + 4.5, y: y + 4.5 };
+
+        // Lógica do caminho em zigue-zague com 8 casas horizontais
+        if (leftToRight) {
+          x += colStep;
+          if (x > (squaresPerRow - 1) * colStep) {
+            leftToRight = false;
+            y += rowStep; // Descida de 3 casas
+          }
+        } else {
+          x -= colStep;
+          if (x < 1) {
+            leftToRight = true;
+            y += rowStep; // Descida de 3 casas
+          }
+        }
+      }
+    }
+
+    // Inicia o jogo
+    function startGame() {
+      const names  = [
+        document.getElementById("player1").value || "Jogador 1",
+        document.getElementById("player2").value || "Jogador 2",
+        document.getElementById("player3").value || "Jogador 3",
+        document.getElementById("player4").value || "Jogador 4"
+      ];
+      
+      const colors = ["red", "blue", "green", "yellow"];
+      players = names.map((name, i) => ({
+        name,
+        color: colors[i],
+        position: 1,
+        points: 0,
+        finished: false,
+        place: null
+      }));
+      
+      // Embaralha as perguntas
+      shuffleQuestions();
+      
+      setupDiv.style.display = "none";
+      gameDiv.style.display  = "block";
+      createBoard();
+      createPieces();
+      updateSidebar();
+      highlightCurrent();
+      
+      messageDiv.className = "info";
+      messageDiv.innerHTML = `Vez de <strong>${players[currentPlayerIndex].name}</strong> (${players[currentPlayerIndex].color})`;
+    }
+
+    // Cria as peças
+    function createPieces() {
+      players.forEach((p, i) => {
+        const pc = document.createElement("div");
+        pc.className = `piece ${p.color}`;
+        pc.id = `piece${i}`;
+        pc.title = p.name;
+        pc.textContent = i+1;
+        boardEl.appendChild(pc);
+        movePiece(i);
+      });
+    }
+
+    function movePiece(i) {
+      const p = players[i];
+      const pos = squarePositions[p.position];
+      const el = document.getElementById(`piece${i}`);
+      
+      // Calcular offset para evitar sobreposição
+      const offsetX = (i % 2) * 4; 
+      const offsetY = Math.floor(i / 2) * 4;
+      
+      el.style.left = `calc(${pos.x}% + ${offsetX}px)`;
+      el.style.top  = `calc(${pos.y}% + ${offsetY}px)`;
+    }
+
+    // Atualiza placar lateral
+    function updateSidebar() {
+      scoreboardDiv.innerHTML = "";
+      players.forEach(p => {
+        const finishedInfo = p.finished ? 
+          `<span class="player-points">${p.place}º Lugar</span>` : 
+          `<span class="player-points">${p.points} pts</span>`;
+        
+        scoreboardDiv.innerHTML +=
+          `<div class="player-info">
+             <div class="player-name" style="color:${p.color}">
+               <span style="display:inline-block; width:12px; height:12px; background:${p.color}; border-radius:50%; margin-right:8px;"></span>
+               ${p.name}
+             </div>
+             ${finishedInfo}
+           </div>`;
+      });
+    }
+
+    // Destaque do jogador ativo
+    function highlightCurrent() {
+      players.forEach((_, i) => {
+        const el = document.getElementById(`piece${i}`);
+        if (i === currentPlayerIndex) {
+          el.style.boxShadow = "0 0 0 4px gold, 0 0 15px 5px rgba(255, 215, 0, 0.7)";
+          el.style.transform = "scale(1.3)";
+          el.style.zIndex = "10";
+        } else {
+          el.style.boxShadow = "0 3px 10px rgba(0, 0, 0, 0.3)";
+          el.style.transform = "scale(1)";
+          el.style.zIndex = "5";
+        }
+      });
+    }
+
+    // Jogada: rola o dado e move a peça
+    function rollDice() {
+      const pl = players[currentPlayerIndex];
+      if (pl.finished) return nextPlayer();
+      
+      rollBtn.disabled = true;
+      answersDiv.innerHTML = "";
+      questionDiv.innerHTML = "Rolando o dado...";
+      messageDiv.className = "info";
+      messageDiv.innerHTML = "Rolando o dado...";
+      
+      // Animação do dado
+      diceEl.textContent = "🎲";
+      diceEl.classList.add('rolling');
+      diceText.textContent = "Rolando...";
+      
+      setTimeout(() => {
+        diceRoll = Math.floor(Math.random() * 6) + 1;
+        const diceFaces = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+        diceEl.textContent = diceFaces[diceRoll - 1];
+        diceEl.classList.remove('rolling');
+        
+        diceText.textContent = `${pl.name} tirou ${diceRoll}!`;
+        messageDiv.innerHTML = `${pl.name} movendo ${diceRoll} casas...`;
+        
+        // Move a peça
+        const newPosition = Math.min(maxPosition, pl.position + diceRoll);
+        pl.position = newPosition;
+        movePiece(currentPlayerIndex);
+        
+        // Verifica se chegou ao final
+        if (newPosition === maxPosition) {
+          setTimeout(() => {
+            pl.finished = true;
+            pl.place = finishOrder++;
+            const bonus = pl.place === 1 ? 30 : pl.place === 2 ? 20 : pl.place === 3 ? 10 : 0;
+            pl.points += bonus;
+            updateSidebar();
+            
+            messageDiv.className = "success";
+            messageDiv.innerHTML = `🏁 <strong>${pl.name}</strong> chegou ao final em ${pl.place}º lugar e ganhou ${bonus} pontos de bônus!`;
+            
+            if (players.every(p => p.finished)) {
+              setTimeout(showFinalMessage, 2000);
+            } else {
+              setTimeout(nextPlayer, 2000);
+            }
+          }, 1500);
+        } else {
+          // Verifica se é casa especial
+          if (specialSquares[newPosition]) {
+            setTimeout(() => {
+              let message = "";
+              let specialAction = false;
+              
+              switch(specialSquares[newPosition].type) {
+                case 'atalho':
+                  const newPosAtalho = Math.min(maxPosition, newPosition + 3);
+                  pl.position = newPosAtalho;
+                  movePiece(currentPlayerIndex);
+                  message = `🚀 ${pl.name} pegou um atalho e avançou para a casa ${newPosAtalho}!`;
+                  break;
+                  
+                case 'labirinto':
+                  const newPosLab = Math.max(1, newPosition - 2);
+                  pl.position = newPosLab;
+                  movePiece(currentPlayerIndex);
+                  message = `🌀 ${pl.name} caiu num labirinto e retrocedeu para a casa ${newPosLab}!`;
+                  break;
+                  
+                case 'desafio':
+                  message = `❓ ${pl.name} encontrou um desafio literário!`;
+                  // Mostra pergunta especial (20 pontos)
+                  const qIndex = Math.floor(Math.random() * questions.length);
+                  showQuestion(questions[qIndex], 20);
+                  return; // Sai da função para aguardar resposta
+              }
+              
+              messageDiv.className = "info";
+              messageDiv.innerHTML = message;
+              setTimeout(nextPlayer, 2000);
+            }, 1500);
+          }
+          // Verifica se é casa de pergunta (posições 2 a 35)
+          else if (newPosition >= 2 && newPosition <= 35) {
+            setTimeout(() => {
+              const qIndex = newPosition - 2; // Ajuste para índice
+              const q = questions[qIndex % questions.length]; // Usa módulo para evitar índice inválido
+              showQuestion(q);
+            }, 1500);
+          } else {
+            // Casa especial (início) - sem pergunta
+            setTimeout(() => {
+              messageDiv.className = "info";
+              messageDiv.innerHTML = `🏠 Casa especial! ${pl.name} não responde pergunta.`;
+              setTimeout(nextPlayer, 1500);
+            }, 1500);
+          }
+        }
+      }, 1000);
+    }
+
+    function showQuestion(q, points = 10) {
+      const author = authors[q.author];
+      questionDiv.innerHTML = `
+        <div style="margin-bottom: 10px; font-size: 0.9rem; color: ${author.color}">
+          Autor: <strong>${author.name}</strong>
+        </div>
+        <div>${q.q}</div>
+      `;
+      
+      answersDiv.innerHTML = "";
+      q.a.forEach((alt, idx) => {
+        answersDiv.innerHTML +=
+          `<button onclick="answer(${idx}, ${q.c}, ${points})" class="btn btn-answer">
+             ${alt}
+           </button>`;
+      });
+    }
+
+    // Resposta e atualização de estado
+    function answer(sel, corr, points) {
+      const pl = players[currentPlayerIndex];
+      answersDiv.innerHTML = "";
+      
+      if (sel === corr) {
+        pl.points += points;
+        messageDiv.className = "success";
+        messageDiv.innerHTML = `🎉 Resposta correta! Ganhou ${points} pontos.`;
+      } else {
+        messageDiv.className = "error";
+        messageDiv.innerHTML = "❌ Resposta incorreta! Tente novamente na próxima vez.";
+      }
+
+      updateSidebar();
+      setTimeout(nextPlayer, 1500);
+    }
+
+    // Passa a vez ao próximo
+    function nextPlayer() {
+      do {
+        currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+      } while (players[currentPlayerIndex].finished);
+      
+      highlightCurrent();
+      rollBtn.disabled = false;
+      questionDiv.innerHTML = "";
+      answersDiv.innerHTML = "";
+      
+      const currentPlayer = players[currentPlayerIndex];
+      messageDiv.className = "info";
+      messageDiv.innerHTML = `Vez de <strong>${currentPlayer.name}</strong> (${currentPlayer.color})`;
+    }
+
+    // Mensagem final com classificação
+    function showFinalMessage() {
+      const ranked = [...players].sort((a, b) => b.points - a.points);
+      
+      finalDiv.style.display = "block";
+      finalDiv.innerHTML = `
+        <h2>✨ Parabéns! O Passeio Literário foi concluído! ✨</h2>
+        
+        <div class="winner">🏆 Vencedor: ${ranked[0].name} com ${ranked[0].points} pontos! 🏆</div>
+        
+        <h3>Classificação Final:</h3>
+        <ul class="ranking">
+          ${ranked.map((p, i) => `
+            <li>
+              <span class="rank">${i + 1}</span>
+              <span style="color:${p.color}">${p.name}</span>
+              <span>${p.points} pontos</span>
+            </li>
+          `).join("")}
+        </ul>
+        
+        <button class='btn btn-reset' onclick='location.reload()'>🔁 Novo Jogo</button>
+      `;
+
+      // Disparar confetes!
+      for (let i = 0; i < 7; i++) {
+        setTimeout(() => confetti({
+          particleCount: 150,
+          spread: 100,
+          origin: { y: 0.6 }
+        }), i * 400);
+      }
+    }
+  </script>
+</body>
+</html>
